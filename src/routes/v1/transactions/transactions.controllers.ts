@@ -1,8 +1,6 @@
 import Stripe from "stripe";
 
-const stripe = new Stripe(
-  "sk_test_51QuTWKClJBhr3sfikQjjaxPgDjsndVS0WlfusMAoxLzAsEOC7NYTKzGTSVkngmlKmSuNa6HGa0wRVLit80kVDRpa004vfKxrUO"
-);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const checkout = async (request, reply) => {
   try {
@@ -77,8 +75,6 @@ export const checkout = async (request, reply) => {
       },
     });
 
-    
-
     return reply.status(200).send({
       success: true,
       message: "Checkout session created successfully",
@@ -97,3 +93,7 @@ export const checkout = async (request, reply) => {
     });
   }
 };
+
+
+//------------------------------
+

@@ -10,6 +10,7 @@ export const getAllUsers = async (request, reply) => {
     const skip = (page - 1) * limit;
 
     const whereCondition: any = {};
+    whereCondition.type = "user";
     if (search) {
       whereCondition.OR = [
         { name: { contains: search, mode: "insensitive" } },

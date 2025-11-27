@@ -5,7 +5,7 @@ export const createPersonalization = async (request, reply) => {
       cookingTime,
       budget,
       dietaryPreference,
-
+      categories,
       recipeType, // optional or "other"
     } = request.body;
 
@@ -75,6 +75,7 @@ export const createPersonalization = async (request, reply) => {
       budget,
       dietaryPreference,
       recipeType,
+      categories,
     };
 
     Object.keys(dataToStore).forEach((key) =>
@@ -94,6 +95,8 @@ export const createPersonalization = async (request, reply) => {
         budget,
         dietaryPreference,
         recipeType,
+        categories,
+
       },
     });
   } catch (error) {
@@ -101,7 +104,8 @@ export const createPersonalization = async (request, reply) => {
     return reply.status(500).send({
       success: false,
       error: error.message,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "Flutter Developer durbol!",
     });
   }
 };

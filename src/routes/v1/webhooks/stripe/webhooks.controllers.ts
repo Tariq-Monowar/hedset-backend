@@ -12,9 +12,8 @@ if (!stripeSecretKey) {
   throw new Error("Missing STRIPE_SECRET_KEY environment variable");
 }
 
-// FIX: Use stripeSecretKey, not webhookSecret!
 const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: "2025-10-29.clover", // Use latest version
+  apiVersion: "2025-10-29.clover",
 });
 
 export const manageWebhook = async (request: FastifyRequest, reply: FastifyReply) => {
@@ -37,34 +36,7 @@ export const manageWebhook = async (request: FastifyRequest, reply: FastifyReply
     }
 
     console.log("============Request Body===============");
-  //   {
-  // id: 'evt_1SUOzQELyaXPVXi6xlR8VuZl',
-  // object: 'event',
-  // api_version: '2025-01-27.acacia',
-  // created: 1763372692,
-  // data: {
-  //   object: {
-  //     id: 'price_1SUOzPELyaXPVXi6uNUEMrtA',
-  //     object: 'price',
-  //     active: true,
-  //     billing_scheme: 'per_unit',
-  //     created: 1763372691,
-  //     currency: 'usd',
-  //     custom_unit_amount: null,
-  //     livemode: false,
-  //     lookup_key: null,
-  //     metadata: {},
-  //     nickname: null,
-  //     product: 'prod_TRHYIaWADzVKv9',
-  //     recurring: [Object],
-  //     tax_behavior: 'unspecified',
-  //     tiers_mode: null,
-  //     transform_quantity: null,
-  //     type: 'recurring',
-  //     unit_amount: 599,
-  //     unit_amount_decimal: '599'
-  //   }
-  // },
+
     let dataPreview: any = (request.body as any)?.data?.object
     console.log(dataPreview)
     console.log("==================================");

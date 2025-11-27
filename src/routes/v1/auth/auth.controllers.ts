@@ -49,7 +49,8 @@ export const registerSendOtp = async (request, reply) => {
     if (missingField) {
       return reply.status(400).send({
         success: false,
-        message: `${missingField} is required!`,
+        // message: `${missingField} is required!`,
+        message: `murubbi! ${missingField} koi?`,
       });
     }
 
@@ -63,7 +64,8 @@ export const registerSendOtp = async (request, reply) => {
     if (existingUser) {
       return reply.status(400).send({
         success: false,
-        message: "User with this email already exists",
+        // message: "User with this email already exists",
+        message: "murubbi! ek email diye koybar register korben?",
       });
     }
 
@@ -87,14 +89,18 @@ export const registerSendOtp = async (request, reply) => {
 
     return reply.status(200).send({
       success: true,
-      message: "send otp in your email!",
+      // message: "send otp in your email!",
+      message: "hay Mr. Flutter Developer! OTP send korechi! apnar email e",
       otp: process.env.NODE_ENV === "development" ? otp : null,
     });
   } catch (error) {
     request.log.error(error);
-    return reply
-      .status(500)
-      .send({ succes: false, error: error, message: "Internal Server Error" });
+    return reply.status(500).send({
+      succes: false,
+      error: error,
+      // message: "Internal Server Error"
+      message: "Flutter Developer durbol!",
+    });
   }
 };
 
@@ -102,10 +108,21 @@ export const registerVerifyOtp = async (request, reply) => {
   try {
     const { email, otp } = request.body;
 
-    if (!email || !otp) {
+    // if (!email || !otp) {
+    //   return reply.status(400).send({
+    //     success: false,
+    //     // message: "Email and OTP are required!",
+    //     message: "murubbi! email and OTP koybar verify korben?",
+    //   });
+    // }
+
+    const missingField = ["email", "otp"].find((field) => !request.body[field]);
+
+    if (missingField) {
       return reply.status(400).send({
         success: false,
-        message: "Email and OTP are required!",
+        // message: `${missingField} is required!`,
+        message: `murubbi! ${missingField} koi?`,
       });
     }
 
@@ -119,7 +136,8 @@ export const registerVerifyOtp = async (request, reply) => {
     if (!Object.keys(userData || {}).length) {
       return reply.status(400).send({
         success: false,
-        message: "not found! please register again",
+        // message: "not found! please register again",
+        message: "bodda apnar time expired! abr suro dori krn!",
       });
     }
 
@@ -168,7 +186,8 @@ export const registerVerifyOtp = async (request, reply) => {
     request.log.error(error);
     return reply.status(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "Flutter Developer durbol!",
       error: error.message,
     });
   }
@@ -219,7 +238,8 @@ export const getRecentOtp = async (request, reply) => {
     request.log.error(error);
     return reply.status(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "Flutter Developer durbol!",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -237,7 +257,8 @@ export const googleAuth = async (request, reply) => {
     if (missingField) {
       return reply.status(400).send({
         success: false,
-        message: `${missingField} is required!`,
+        // message: `${missingField} is required!`,
+        message: `murubbi! ${missingField} koi?`,
       });
     }
 
@@ -309,7 +330,8 @@ export const googleAuth = async (request, reply) => {
     request.log.error(error);
     return reply.status(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "Flutter Developer durbol!",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -326,7 +348,8 @@ export const usersLogin = async (request, reply) => {
     if (missingField) {
       return reply.status(400).send({
         success: false,
-        message: `${missingField} is required!`,
+        // message: `${missingField} is required!`,
+        message: `murubbi! ${missingField} koi?`,
       });
     }
     const prisma = request.server.prisma;
@@ -336,7 +359,8 @@ export const usersLogin = async (request, reply) => {
     if (!user || user.type === "admin") {
       return reply.status(404).send({
         success: false,
-        message: "User not found",
+        // message: "User not found",
+        message: "murobbi apnar account nai! age register korben?",
       });
     }
 
@@ -345,7 +369,8 @@ export const usersLogin = async (request, reply) => {
     if (!passwordMatch) {
       return reply.status(401).send({
         success: false,
-        message: "Invalid password",
+        // message: "Invalid password",
+        message: "password to mile na! amk 500৳ TK pay krn! thik kre dibo?",
       });
     }
 
@@ -372,7 +397,8 @@ export const usersLogin = async (request, reply) => {
     request.log.error(error);
     return reply.status(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "Flutter Developer durbol!",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -435,7 +461,8 @@ export const adminLogin = async (request, reply) => {
     request.log.error(error);
     return reply.status(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "Flutter Developer durbol!",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -448,7 +475,8 @@ export const forgotPasswordSendOtp = async (request, reply) => {
     if (!email) {
       return reply.status(400).send({
         success: false,
-        message: "Email is required!",
+        // message: "Email is required!",
+        message: "murubbi! email koi?",
       });
     }
 
@@ -462,7 +490,8 @@ export const forgotPasswordSendOtp = async (request, reply) => {
     if (!existingUser) {
       return reply.status(404).send({
         success: false,
-        message: "User with this email does not exist",
+        // message: "User with this email does not exist",
+        message: "murobbi apnar account nai! age register krn?",
       });
     }
 
@@ -485,14 +514,16 @@ export const forgotPasswordSendOtp = async (request, reply) => {
 
     return reply.status(200).send({
       success: true,
-      message: "OTP sent to your email for password reset",
+      // message: "OTP sent to your email for password reset",
+      message: "hay Mr. Flutter Developer! OTP send korechi! apnar email e",
       otp: process.env.NODE_ENV === "development" ? otp : null,
     });
   } catch (error) {
     request.log.error(error);
     return reply.status(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "Flutter Developer durbol!",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -560,13 +591,16 @@ export const forgotPasswordVerifyOtp = async (request, reply) => {
 
     return reply.status(200).send({
       success: true,
-      message: "OTP verified successfully! You can now reset your password.",
+      // message: "OTP verified successfully! You can now reset your password.",
+      message:
+        "hay Mr. Flutter Developer! OTP verified successfully! You can now reset your password.",
     });
   } catch (error) {
     request.log.error(error);
     return reply.status(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "Flutter Developer durbol!",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -596,14 +630,16 @@ export const forgotPasswordReset = async (request, reply) => {
     if (!Object.keys(otpData || {}).length) {
       return reply.status(400).send({
         success: false,
-        message: "Password reset session expired!",
+        // message: "Password reset session expired!",
+        message: "bodda apnar time expired! abr suro dori krn!",
       });
     }
 
     if (otpData.permission_to_update_password !== "true") {
       return reply.status(400).send({
         success: false,
-        message: "Permission to update password not granted!",
+        // message: "Permission to update password not granted!",
+        message: "amk 500৳ TK pay krn! thik kre dibo?",
       });
     }
 
@@ -629,13 +665,15 @@ export const forgotPasswordReset = async (request, reply) => {
 
     return reply.status(200).send({
       success: true,
-      message: "Password reset successfully!",
+      // message: "Password reset successfully!",
+      message: "hay Mr. Flutter Developer! Password reset successfully!",
     });
   } catch (error) {
     request.log.error(error);
     return reply.status(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "Flutter Developer durbol!",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -671,7 +709,8 @@ export const forgotPasswordRecentOtp = async (request, reply) => {
     if (!Object.keys(otpData || {}).length) {
       return reply.status(404).send({
         success: false,
-        message: "No active OTP session found. Please request a new OTP.",
+        // message: "No active OTP session found. Please request a new OTP.",
+        message: "bodda apnar time expired! abr suro dori krn!",
       });
     }
 
@@ -699,7 +738,8 @@ export const forgotPasswordRecentOtp = async (request, reply) => {
     request.log.error(error);
     return reply.status(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "Flutter Developer durbol!",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -805,7 +845,8 @@ export const email2FASendOtp = async (request, reply) => {
     request.log.error(error);
     return reply.status(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "Flutter Developer durbol!",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -876,7 +917,8 @@ export const email2FAVerifyOtp = async (request, reply) => {
     request.log.error(error);
     return reply.status(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "Flutter Developer durbol!",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -940,7 +982,8 @@ export const email2FARecentOtp = async (request, reply) => {
     request.log.error(error);
     return reply.status(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "developer durbol!",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -1029,7 +1072,8 @@ export const permissions = async (request, reply) => {
 
     return reply.status(500).send({
       success: false,
-      message: "Internal function error",
+      // message: "Internal function error",
+      message: "developer durbol!",
     });
   }
 };
@@ -1104,7 +1148,8 @@ export const updateUser = async (request, reply) => {
 
     return reply.code(200).send({
       success: true,
-      message: "User profile updated successfully",
+      // message: "User profile updated successfully",
+      message: "becara Mr. Flutter Developer! profile update korechi!",
       data: {
         ...updatedUser,
         avatar: updatedUser.avatar ? getImageUrl(updatedUser.avatar) : null,
@@ -1119,7 +1164,8 @@ export const updateUser = async (request, reply) => {
 
     return reply.code(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "developer durbol!",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -1136,7 +1182,8 @@ export const getUserProfile = async (request, reply) => {
     if (!user) {
       return reply.status(404).send({
         success: false,
-        message: "User not found",
+        // message: "User not found",
+        message: "murobbi apnar account nai! age register korben?",
       });
     }
     const { password, ...userData } = user;
@@ -1153,7 +1200,8 @@ export const getUserProfile = async (request, reply) => {
     request.log.error(error);
     return reply.status(500).send({
       success: false,
-      message: "Internal Server Error",
+      // message: "Internal Server Error",
+      message: "Flutter Developer durbol!",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

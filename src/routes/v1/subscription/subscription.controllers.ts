@@ -56,6 +56,7 @@ export const createStripeProducts = async (request, reply) => {
       });
     }
 
+    console.log("description", description);
     const product = await stripe.products.create({
       name,
       description: Array.isArray(description)
@@ -78,9 +79,7 @@ export const createStripeProducts = async (request, reply) => {
     const subscriptionPackage = await prisma.subscriptionPackage.create({
       data: {
         name,
-        description: Array.isArray(description)
-          ? description.map((d) => d.text).join(", ")
-          : description,
+        description: description as string[],
         amount: Number(amount),
         currency,
         interval,
@@ -129,7 +128,10 @@ export const createStripeProducts = async (request, reply) => {
   }
 };
 
+//----------------------------------------------------------
 export const getStripeProducts = async (request, reply) => {
+  //    const products = await stripe.products.list();
+  // console.log(products);
   try {
     const page = parseInt(request.query.page as string) || 1;
     const limit = parseInt(request.query.limit as string) || 10;
@@ -432,6 +434,3 @@ export const deleteStripeProducts = async (
     });
   }
 };
-function type(interval_count: any): any {
-  throw new Error("Function not implemented.");
-}
