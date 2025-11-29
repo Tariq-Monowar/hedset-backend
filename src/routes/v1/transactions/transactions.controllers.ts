@@ -52,7 +52,7 @@ export const checkout = async (request, reply) => {
       mode: "subscription",
 
       success_url:
-        "myflutterapp://payment-success?session_id={CHECKOUT_SESSION_ID}",
+        `myflutterapp://payment-success?session`,
       cancel_url: "myflutterapp://payment-cancel",
 
       client_reference_id: userId,
