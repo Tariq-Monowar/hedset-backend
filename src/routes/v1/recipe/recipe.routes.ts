@@ -48,7 +48,7 @@ const recipeRoutes = (fastify: FastifyInstance) => {
   fastify.get(
     "/all",
     {
-      preHandler: [verifyUser("user")],
+      preHandler: [verifyUser("user", "admin")],
     },
     getAllRecipes
   );

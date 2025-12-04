@@ -263,6 +263,7 @@ export const deleteRecipe = async (request, reply) => {
 };
 
 export const getAllRecipes = async (request, reply) => {
+  console.log("getAllRecipes-------------------------");
   try {
     const prisma = request.server.prisma;
 

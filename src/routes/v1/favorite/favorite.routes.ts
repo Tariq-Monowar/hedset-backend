@@ -2,7 +2,7 @@ import { FastifyInstance } from "fastify";
 
 import { upload } from "../../../config/storage.config";
 import { verifyUser } from "../../../middleware/auth.middleware";
-import { getAllFavorite, manageFavorite } from "./favorite.controllers";
+import { getAllFavorite, manageFavorite, getSingleFavoriteByUserId } from "./favorite.controllers";
 
 const favoriteRoutes = (fastify: FastifyInstance) => {
   fastify.post(
@@ -19,6 +19,13 @@ const favoriteRoutes = (fastify: FastifyInstance) => {
       preHandler: [verifyUser("user")],
     },
     getAllFavorite
+  );
+  fastify.get(
+    "/recipe/single-recipe/:id",
+    {
+      preHandler: [verifyUser("user")],
+    },
+    getSingleFavoriteByUserId
   );
 };
 
