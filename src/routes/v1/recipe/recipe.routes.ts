@@ -3,6 +3,7 @@ import {
   createRecipe,
   deleteRecipe,
   getAllRecipes,
+  getListOfRecipes,
   getSingleRecipes,
   getPersonalizedRecipe,
   updateRecipe,
@@ -11,6 +12,15 @@ import { upload } from "../../../config/storage.config";
 import { verifyUser } from "../../../middleware/auth.middleware";
 
 const recipeRoutes = (fastify: FastifyInstance) => {
+    // get a list of Recipe that are  not favorited
+  fastify.get(
+    "/list",
+    {
+      preHandler: [verifyUser("user")],
+    },
+    getListOfRecipes
+  );
+
   fastify.post(
     "/create",
     {
@@ -38,20 +48,18 @@ const recipeRoutes = (fastify: FastifyInstance) => {
   fastify.get(
     "/all",
     {
-      preHandler: [verifyUser("admin")],
+      preHandler: [verifyUser("user")],
     },
     getAllRecipes
   );
 
-    fastify.get(
+  fastify.get(
     "/all/:id",
     {
       preHandler: [verifyUser("admin")],
     },
     getSingleRecipes
   );
-
-  
 
   fastify.get(
     "/personalized",

@@ -1,1 +1,0 @@
-{"version":3,"file":"ai.routes.js","sourceRoot":"","sources":["../../../../../src/routes/v1/ai/ai.routes.ts"],"names":[],"mappings":";;AAGA,yEAAiE;AACjE,qDAAkD;AAElD,MAAM,QAAQ,GAAG,CAAC,OAAwB,EAAE,EAAE;IAC5C,OAAO,CAAC,IAAI,CACV,WAAW,EACX;QACE,UAAU,EAAE,CAAC,IAAA,4BAAU,EAAC,MAAM,CAAC,CAAC;KACjC,EACD,+BAAc,CACf,CAAC;AACJ,CAAC,CAAC;AAEF,kBAAe,QAAQ,CAAC"}

@@ -6,7 +6,7 @@ import { getAllFavorite, manageFavorite } from "./favorite.controllers";
 
 const favoriteRoutes = (fastify: FastifyInstance) => {
   fastify.post(
-    "/recipe/:recipeId",
+    "/recipe/manage",
     {
       preHandler: [verifyUser("user")],
     },

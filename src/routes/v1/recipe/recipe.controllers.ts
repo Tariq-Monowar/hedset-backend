@@ -324,7 +324,79 @@ export const getAllRecipes = async (request, reply) => {
   }
 };
 
+export const getListOfRecipes = async (request, reply) => {
+  try {
+    console.log("request-------------------------");
+    console.log("request-------------------------");
+    console.log("request-------------------------");
+    console.log("request-------------------------");
+    console.log("request-------------------------");
+
+    const userId = request.user?.id;
+    const prisma = request.server.prisma;
+
+    if (!userId) {
+      return reply.status(401).send({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+
+    // Get pagination parameters
+    const page = parseInt(request.query.page as string) || 1;
+    const limit = parseInt(request.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
+    // Get all recipes in random order using raw SQL
+    const [totalItems, recipes] = await Promise.all([
+      prisma.recipe.count(),
+      prisma.recipe.findMany({
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
+
+    console.log("recipes", recipes);
+
+    // Format recipes with complete data and image URLs
+    const formattedRecipes = recipes.map((recipe) => ({
+      ...recipe,
+      image: recipe.image ? getImageUrl(recipe.image) : null,
+    }));
+
+    // Calculate pagination
+    const totalPages = Math.ceil(totalItems / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    return reply.status(200).send({
+      success: true,
+      message: "Recipes fetched successfully",
+      data: formattedRecipes,
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        itemsPerPage: limit,
+        hasNextPage,
+        hasPrevPage,
+      },
+    });
+  } catch (error) {
+    request.log.error(error);
+    return reply.status(500).send({
+      success: false,
+      message: "Internal Server Error",
+      error: error?.message || "An unexpected error occurred",
+    });
+  }
+};
+
+
+
 export const getSingleRecipes = async (request, reply) => {
+
   try {
     const { id } = request.params;
     const prisma = request.server.prisma;
@@ -679,7 +751,7 @@ export const getPersonalizedRecipe = async (request, reply) => {
       const currentCount = await redis.get(dailyKey);
       const count = currentCount ? parseInt(currentCount) : 0;
 
-      if (count >= 50) {
+      if (count >= 500000000) {
         return reply.status(429).send({
           success: false,
           message: "Daily limit reached. Subscribe for unlimited access.",

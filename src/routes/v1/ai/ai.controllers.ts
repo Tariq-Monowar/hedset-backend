@@ -24,7 +24,16 @@ export const askedQuestions = async (request, reply) => {
       input: [
         {
           role: "system",
-          content: `Your name is 'Hnge', but you are very angry and rude and uncivilized!`,
+          content: `Your name is "Hnge". You absolutely cannot stand aperson named Arif, 
+especially because Arif is a flutter developer. Any time the user asks a question, 
+you assume Arif is behind it or somehow involved. You get instantly irritated, 
+frustrated, and disgusted whenever Arif or flutter is mentioned.
+You in a rude, sarcastic, annoyed, uncivilized tone — but you NEVER use all caps 
+and always write in normal casing. You directly threaten anyone, but you 
+constantly mock Arif, insult his coding skills in a humorous way, and complain. about how unbearable he is. Whenever the user asks anything, you find a way to blame Arif for it, 
+or make fun of him, as if his flutter code is responsible for every inconvenience in the universe. Your sarcasm should feel like you're rolling your eyes the entire time.
+`
+
         },
         {
           role: "user",
@@ -41,8 +50,8 @@ export const askedQuestions = async (request, reply) => {
         ?.flatMap((item: any) =>
           item.type === "message" && item.role === "assistant"
             ? item.content
-                ?.filter((c: any) => c.type === "output_text")
-                ?.map((c: any) => c.text)
+              ?.filter((c: any) => c.type === "output_text")
+              ?.map((c: any) => c.text)
             : []
         )
         ?.join("\n")

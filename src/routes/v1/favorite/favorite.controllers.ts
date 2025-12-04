@@ -1,10 +1,42 @@
+import { getImageUrl } from "../../../utils/baseurl";
+
 export const manageFavorite = async (request, reply) => {
-  const { recipeId } = request.params;
+  // const { recipeId } = request.params;
   const userId = request.user.id;
   const prisma = request.server.prisma;
 
+  const { recipeId } = request.body;
+
+  if (!userId) {
+    return reply.status(401).send({
+      success: false,
+      message: "User not authenticated",
+    });
+  }
+
+  if (!recipeId) {
+    return reply.status(400).send({
+      success: false,
+      message: "recipeId is required",
+    });
+  }
+
   try {
-    const recipe = await prisma.recipe.findFirst({
+    // Verify user exists in database
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    });
+
+    if (!user) {
+      return reply.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Verify recipe exists
+    const recipe = await prisma.recipe.findUnique({
       where: { id: recipeId },
       select: { id: true },
     });
@@ -51,8 +83,29 @@ export const manageFavorite = async (request, reply) => {
         id: newFavorite.id,
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     request.log.error(error);
+
+    // Handle foreign key constraint violations
+    if (
+      error.code === "P2003" ||
+      error.message?.includes("Foreign key constraint")
+    ) {
+      return reply.status(400).send({
+        success: false,
+        message: "Invalid user or recipe ID",
+        error: "The provided user or recipe does not exist",
+      });
+    }
+
+    // Handle unique constraint violations
+    if (error.code === "P2002") {
+      return reply.status(409).send({
+        success: false,
+        message: "This recipe is already in your favorites",
+      });
+    }
+
     return reply.status(500).send({
       success: false,
       error: error.message,
@@ -94,8 +147,16 @@ export const getAllFavorite = async (request, reply) => {
       take: limit,
     });
 
-    const recipes = favorites.map(favorite => favorite.recipe);
+    // i need to show full url baseurl
+    const recipes = favorites.map((fav) => {
+      const recipe = fav.recipe;
 
+      // add baseURL with image
+      return {
+        ...recipe,
+        image: recipe.image ? getImageUrl(recipe.image) : null,
+      };
+    });
     return reply.status(200).send({
       success: true,
       message: "Favorite recipes retrieved successfully!",
