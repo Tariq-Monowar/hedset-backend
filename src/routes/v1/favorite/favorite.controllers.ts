@@ -178,3 +178,38 @@ export const getAllFavorite = async (request, reply) => {
     });
   }
 };
+
+export const getSingleFavoriteByUserId = async (request, reply) => {
+  try {
+    const recipeId = request.params.id;
+    const prisma = request.server.prisma;
+
+    const recipe = await prisma.recipe.findFirst({
+      where: {
+        recipeId: recipeId,
+      },
+    });
+
+    if (!recipe) {
+      return reply.status(404).send({
+        success: false,
+        message: "Favorite not found",
+      });
+    }
+
+    return reply.status(200).send({
+      success: true,
+      message: "Favorite fetched successfully",
+      data: {
+        ...recipe,
+        image: recipe.image ? getImageUrl(recipe.image) : null,
+      },
+    });
+  } catch (error) {
+    return reply.status(500).send({
+      success: false,
+      error: error.message,
+      message: "Internal Server Error",
+    });
+  }
+};

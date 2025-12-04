@@ -1,4 +1,4 @@
- 
+import { getImageUrl } from "../../../utils/baseurl";
 
 export const getAllUsers = async (request, reply) => {
   try {
@@ -9,47 +9,150 @@ export const getAllUsers = async (request, reply) => {
     const search = request.query.search || "";
     const skip = (page - 1) * limit;
 
-    const whereCondition: any = {};
-    whereCondition.type = "user";
-    if (search) {
-      whereCondition.OR = [
-        { name: { contains: search, mode: "insensitive" } },
-        { email: { contains: search, mode: "insensitive" } },
-        { phone: { contains: search, mode: "insensitive" } },
-      ];
-    }
+    // Build Prisma WHERE condition
+    const whereCondition = {
+      type: "user",
+      ...(search && {
+        OR: [
+          { name: { contains: search, mode: "insensitive" } },
+          { email: { contains: search, mode: "insensitive" } },
+          { phone: { contains: search, mode: "insensitive" } },
+        ],
+      }),
+    };
 
     const [totalItems, users] = await Promise.all([
-      prisma.user.count({ where: whereCondition }),
+      prisma.user.count({
+        where: whereCondition,
+      }),
       prisma.user.findMany({
         where: whereCondition,
         skip,
         take: limit,
-        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          createdAt: true,
+          avatar: true,
+          // isSubscriber: true,
+        },
       }),
     ]);
 
     const totalPages = Math.ceil(totalItems / limit);
-    const hasNextPage = page < totalPages;
-    const hasPrevPage = page > 1;
+
+    const data = users.map((user) => ({
+      ...user,
+      avatar: user.avatar ? getImageUrl(user.avatar) : null,
+    }));
 
     return reply.status(200).send({
       success: true,
       message: "Users fetched successfully",
-      data: users,
+      data,
       pagination: {
         totalItems,
         totalPages,
         currentPage: page,
         itemsPerPage: limit,
-        hasNextPage,
-        hasPrevPage,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
       },
     });
   } catch (error) {
     return reply.status(500).send({
       success: false,
-      error: error,
+      error,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const earningsParser = async (request, reply) => {
+  try {
+    const prisma = request.server.prisma;
+    // i wanna show par user earnings
+    const earnings = await prisma.transaction
+      .groupBy({
+        by: ["userId"],
+        _sum: {
+          amount: true,
+        },
+      })
+      .then((result) =>
+        result.map((item) => ({
+          userId: item.userId,
+          amount: item._sum.amount,
+        }))
+      );
+
+    const users = await prisma.user.findMany({
+      where: {
+        id: { in: earnings.map((item) => item.userId) },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        createdAt: true,
+        avatar: true,
+      },
+    });
+
+    const data = users.map((user) => ({
+      ...user,
+      avatar: user.avatar ? getImageUrl(user.avatar) : null,
+      earnings: earnings.find((item) => item.userId === user.id)?.amount || 0,
+    }));
+
+    return reply.status(200).send({
+      success: true,
+      message: "Earnings parsed successfully",
+      data,
+    });
+  } catch (error) {
+    return reply.status(500).send({
+      success: false,
+      error,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const getUserById = async (request, reply) => {
+  try {
+    const userId = request.params.id;
+    const prisma = request.server.prisma;
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return reply.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    //avatar url
+  
+
+     
+    return reply.status(200).send({
+      success: true,
+      message: "User fetched successfully",
+      data: {
+        ...user,
+        avatar: user.avatar ? getImageUrl(user.avatar) : null,
+      },
+    });
+  } catch (error) {
+    return reply.status(500).send({
+      success: false,
+      error,
       message: "Internal Server Error",
     });
   }

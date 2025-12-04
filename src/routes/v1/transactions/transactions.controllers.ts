@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import Stripe from "stripe";
+import { getImageUrl } from "../../../utils/baseurl";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("Missing STRIPE_SECRET_KEY environment variable");
@@ -187,6 +188,148 @@ export const cancelSubscription = async (request: FastifyRequest, reply: Fastify
     return reply.status(500).send({
       success: false,
       message: "Failed to cancel subscription",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
+interface DashboardStatsQuery {
+  year?: string;
+}
+
+/**
+ * Get dashboard statistics
+ * Returns total earnings, total users, total subscriptions, monthly earnings chart data, and recent users
+ */
+export const getDashboardStats = async (
+  request: FastifyRequest<{ Querystring: DashboardStatsQuery }>,
+  reply: FastifyReply
+) => {
+  try {
+    const prisma = request.server.prisma;
+    const year = request.query?.year ? parseInt(request.query.year) : new Date().getFullYear();
+
+    // Validate year
+    if (isNaN(year) || year < 2000 || year > 2100) {
+      return reply.status(400).send({
+        success: false,
+        message: "Invalid year parameter",
+      });
+    }
+
+    // 1. Total Earnings - sum of all completed transactions
+    const totalEarningsResult = await prisma.transaction.aggregate({
+      where: {
+        status: "completed",
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+    const totalEarnings = totalEarningsResult._sum.amount || 0;
+
+    // 2. Total Users - count of all users
+    const totalUsers = await prisma.user.count();
+
+    // 3. Total Subscriptions - count of all users who have ever gotten a subscription
+    // (users with at least one completed transaction)
+    const totalSubscriptions = await prisma.transaction.groupBy({
+      by: ["userId"],
+      where: {
+        status: "completed",
+      },
+    }).then((result) => result.length);
+
+    // 4. Monthly Earnings Chart Data - grouped by month for the specified year
+    const startDate = new Date(year, 0, 1); // January 1st of the year
+    const endDate = new Date(year, 11, 31, 23, 59, 59, 999); // December 31st of the year
+
+    // Get all completed transactions for the year
+    const transactions = await prisma.transaction.findMany({
+      where: {
+        status: "completed",
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      select: {
+        amount: true,
+        createdAt: true,
+      },
+    });
+
+    // Group by month and sum amounts
+    const monthlyEarnings: { [key: number]: number } = {};
+    
+    // Initialize all months to 0
+    for (let month = 0; month < 12; month++) {
+      monthlyEarnings[month] = 0;
+    }
+
+    // Sum amounts by month
+    transactions.forEach((transaction) => {
+      const month = transaction.createdAt.getMonth();
+      monthlyEarnings[month] = (monthlyEarnings[month] || 0) + transaction.amount;
+    });
+
+    // Format chart data with month names
+    const monthNames = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    const earningsChartData = monthNames.map((monthName, index) => ({
+      month: monthName,
+      earnings: monthlyEarnings[index] || 0,
+    }));
+
+    // 5. Recent 20 Users - last 20 users ordered by createdAt
+    const recentUsers = await prisma.user.findMany({
+      take: 20,
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        createdAt: true,
+        avatar: true,
+      },
+    });
+
+    // Format recent users with serial numbers
+    const formattedRecentUsers = recentUsers.map((user, index) => ({
+      sl: index + 1,
+      id: user.id,
+      name: user.name || "N/A",
+      email: user.email,
+      phoneNumber: user.phone || "N/A",
+      createdAt: user.createdAt,
+      avatar: user.avatar ? getImageUrl(user.avatar) : null,
+    }));
+
+    return reply.status(200).send({
+      success: true,
+      message: "Dashboard statistics retrieved successfully",
+      data: {
+        totalEarnings: parseFloat(totalEarnings.toFixed(2)),
+        totalUsers,
+        totalSubscriptions,
+        earningsChart: {
+          year,
+          data: earningsChartData,
+        },
+        recentUsers: formattedRecentUsers,
+      },
+    });
+  } catch (error) {
+    request.log.error({ err: error }, "Error fetching dashboard statistics");
+    return reply.status(500).send({
+      success: false,
+      message: "Failed to fetch dashboard statistics",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

@@ -2,7 +2,7 @@ import { FastifyInstance } from "fastify";
 
 import { upload } from "../../../config/storage.config";
 import { verifyUser } from "../../../middleware/auth.middleware";
-import { checkout, cancelSubscription } from "./transactions.controllers";
+import { checkout, cancelSubscription, getDashboardStats } from "./transactions.controllers";
 
 const transactionRoutes = (fastify: FastifyInstance) => {
   fastify.post(
@@ -19,6 +19,14 @@ const transactionRoutes = (fastify: FastifyInstance) => {
       preHandler: [verifyUser("admin", "user")],
     },
     cancelSubscription
+  );
+
+  fastify.get(
+    "/dashboard",
+    // {
+    //   preHandler: [verifyUser("admin")],
+    // },
+    getDashboardStats
   );
 };
 
