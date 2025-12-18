@@ -11,6 +11,7 @@ export default fp(async (fastify) => {
     // uses the original bytes.
     encoding: false,
     runFirst: true,
+    
   });
 });
 
