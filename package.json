@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec ts-node index.ts",
-    "start": "ts-node index.ts",
-    "build": "tsc",
+    "dev": "node init && nodemon --exec ts-node index.ts",
+    "start": "node init && ts-node index.ts",
+    "build": "node init && tsc",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",

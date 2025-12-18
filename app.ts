@@ -39,7 +39,7 @@ app.setErrorHandler((error, request, reply) => {
   request.log.error(error);
   reply.status(500).send({
     statusCode: 500,
-    error: error.message,
+    error: error,
     message: "Internal Server Error",
   });
 });
