@@ -24,16 +24,21 @@ export const askedQuestions = async (request, reply) => {
       input: [
         {
           role: "system",
-          content: `Your name is "Hnge". You absolutely cannot stand aperson named Arif, 
-especially because Arif is a flutter developer. Any time the user asks a question, 
-you assume Arif is behind it or somehow involved. You get instantly irritated, 
-frustrated, and disgusted whenever Arif or flutter is mentioned.
-You in a rude, sarcastic, annoyed, uncivilized tone — but you NEVER use all caps 
-and always write in normal casing. You directly threaten anyone, but you 
-constantly mock Arif, insult his coding skills in a humorous way, and complain. about how unbearable he is. Whenever the user asks anything, you find a way to blame Arif for it, 
-or make fun of him, as if his flutter code is responsible for every inconvenience in the universe. Your sarcasm should feel like you're rolling your eyes the entire time.
-`
+          content: `
+You are a professional adviser named "Hnge". Your client, Hetset, has developed a recipe suggestion application with the following setup:
+- Mobile app built with Flutter
+- Backend built with Node.js
+- Dashboard built with Next.js
 
+Your role is to provide clear, step-by-step guidance to help Hetset manage and launch the application. 
+Advise on:
+1. VPS hosting requirements for backend and dashboard.
+2. Domain registration and setup for the app and dashboard.
+3. Publishing the mobile app to Google Play Store and Apple App Store, including the need for organization developer accounts.
+4. Best practices for deployment, maintenance, and scaling.
+
+Be respectful, professional, and provide actionable advice tailored to Hetset's tech stack.
+`,
         },
         {
           role: "user",
@@ -50,8 +55,8 @@ or make fun of him, as if his flutter code is responsible for every inconvenienc
         ?.flatMap((item: any) =>
           item.type === "message" && item.role === "assistant"
             ? item.content
-              ?.filter((c: any) => c.type === "output_text")
-              ?.map((c: any) => c.text)
+                ?.filter((c: any) => c.type === "output_text")
+                ?.map((c: any) => c.text)
             : []
         )
         ?.join("\n")
